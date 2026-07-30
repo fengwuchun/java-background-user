@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>AI Skills Demo</title>
+
+
+<!-- Excel生成 -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+    font-family:"Microsoft YaHei",sans-serif;
+}
+
+
+body{
+    margin:0;
+    background:#f5f7fa;
+}
+
+
+header{
+
+    background:#1f2937;
+    color:white;
+    padding:25px;
+    text-align:center;
+
+}
+
+
+
+.container{
+
+    width:1100px;
+    margin:30px auto;
+
+}
+
+
+
+.skills{
+
+    display:flex;
+    gap:20px;
+
+}
+
+
+
+.card{
+
+    background:white;
+    border-radius:12px;
+    padding:25px;
+    flex:1;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+
+}
+
+
+.card h3{
+
+    color:#2563eb;
+
+}
+
+
+
+button{
+
+    background:#2563eb;
+    border:none;
+    color:white;
+    padding:10px 20px;
+    border-radius:6px;
+    cursor:pointer;
+
+}
+
+
+
+button:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+
+input{
+
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+
+}
+
+
+
+.auth{
+
+    margin-top:40px;
+    display:flex;
+    gap:40px;
+
+}
+
+
+
+.box{
+
+    background:white;
+    padding:30px;
+    width:400px;
+    border-radius:12px;
+
+}
+
+
+
+.result{
+
+    color:green;
+
+}
+
+
+
+/* Excel区域 */
+
+
+.excel-box{
+
+    margin-top:40px;
+
+    background:white;
+
+    padding:30px;
+
+    border-radius:12px;
+
+}
+
+
+
+.progress{
+
+    height:20px;
+
+    background:#eee;
+
+    border-radius:10px;
+
+}
+
+
+
+.bar{
+
+    height:100%;
+
+    width:0;
+
+    background:#22c55e;
+
+    border-radius:10px;
+
+}
+
+
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:20px;
+
+}
+
+
+
+td,th{
+
+    border:1px solid #ddd;
+
+    padding:10px;
+
+    text-align:center;
+
+}
+
+
+
+.log{
+
+    margin-top:40px;
+
+    background:#111827;
+
+    color:#22c55e;
+
+    padding:20px;
+
+    border-radius:10px;
+
+    font-family:monospace;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+
+<header>
+
+<h1>
+AI Skills 工作流 Demo
+</h1>
+
+<p>
+官方 Skill + 自定义 Skill 示例
+</p>
+
+
+</header>
+
+
+
+
+<div class="container">
+
+
+
+<h2>
+Skills 示例
+</h2>
+
+
+
+<div class="skills">
+
+
+
+<!-- Word Skill -->
+
+<div class="card">
+
+
+<h3>
+📄 Word 转 Excel Skill
+</h3>
+
+
+<p>
+上传Word文档，通过Skill转换Excel。
+</p>
+
+
+
+<input 
+type="file"
+id="wordFile"
+accept=".doc,.docx">
+
+
+
+<button onclick="wordToExcelSkill()">
+
+运行 Skill
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+🔐 登录注册生成 Skill
+</h3>
+
+
+<p>
+自动生成用户注册、
+登录、JWT认证模块。
+</p>
+
+
+<button onclick="runSkill('登录注册模块')">
+
+运行 Skill
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+<div class="card">
+
+<h3>
+🤖 Code Generator
+</h3>
+
+
+<p>
+根据需求生成HTML、
+Java Spring Boot代码。
+</p>
+
+
+<button onclick="runSkill('代码生成')">
+
+运行 Skill
+
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- Excel结果 -->
+
+
+<div class="excel-box">
+
+
+<h2>
+WordToExcel 输出结果
+</h2>
+
+
+<div class="progress">
+
+<div class="bar" id="bar">
+
+</div>
+
+</div>
+
+
+<p id="excelStatus">
+等待执行...
+</p>
+
+
+
+<table id="excelTable">
+
+
+</table>
+
+
+
+<br>
+
+
+<button onclick="downloadExcel()">
+
+下载 result.xlsx
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+<h2>
+自定义 Skill 登录注册 Demo
+</h2>
+
+
+
+
+<div class="auth">
+
+
+<div class="box">
+
+
+<h3>
+用户注册
+</h3>
+
+
+<input id="username"
+placeholder="用户名">
+
+
+<input id="password"
+type="password"
+placeholder="密码">
+
+
+
+<button onclick="register()">
+
+注册
+
+</button>
+
+
+
+<p class="result" id="registerResult">
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+<div class="box">
+
+
+<h3>
+用户登录
+</h3>
+
+
+<input id="loginUser"
+placeholder="用户名">
+
+
+<input id="loginPass"
+type="password"
+placeholder="密码">
+
+
+
+<button onclick="login()">
+
+登录
+
+</button>
+
+
+
+<p class="result" id="loginResult">
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="log" id="log">
+
+等待 Skill 调用...
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+<script>
+
+
+// Skill日志
+
+function runSkill(name){
+
+
+document.getElementById("log").innerHTML +=
+
+"<br>> 执行 Skill: "+name;
+
+
+}
+
+
+
+
+
+
+// Word转Excel Skill
+
+let excelData=[
+
+["姓名","年龄","部门","工资"],
+
+["张三",28,"技术部",12000],
+
+["李四",32,"产品部",15000],
+
+["王五",26,"运营部",9000]
+
+];
+
+
+
+
+
+function wordToExcelSkill(){
+
+
+
+let file =
+document.getElementById("wordFile").files[0];
+
+
+if(!file){
+
+alert("请选择Word文件");
+
+return;
+
+}
+
+
+
+runSkill("Word转Excel");
+
+
+
+let bar=
+document.getElementById("bar");
+
+
+let status=
+document.getElementById("excelStatus");
+
+
+
+status.innerHTML=
+"正在读取Word文件...";
+
+
+bar.style.width="30%";
+
+
+
+setTimeout(()=>{
+
+
+status.innerHTML=
+"解析Word内容...";
+
+
+bar.style.width="60%";
+
+
+},1000);
+
+
+
+
+setTimeout(()=>{
+
+
+status.innerHTML=
+"生成Excel完成";
+
+
+bar.style.width="100%";
+
+
+showExcel();
+
+
+},2000);
+
+
+
+}
+
+
+
+
+
+
+
+function showExcel(){
+
+
+let table=
+document.getElementById("excelTable");
+
+
+table.innerHTML="";
+
+
+
+excelData.forEach((row,index)=>{
+
+
+let tr=document.createElement("tr");
+
+
+row.forEach(cell=>{
+
+
+let td=document.createElement(
+index==0?"th":"td"
+);
+
+
+td.innerHTML=cell;
+
+
+tr.appendChild(td);
+
+
+});
+
+
+table.appendChild(tr);
+
+
+});
+
+
+
+document.getElementById("log").innerHTML +=
+
+"<br>> Excel Generated";
+
+}
+
+
+
+
+
+
+
+
+function downloadExcel(){
+
+
+let workbook=
+XLSX.utils.book_new();
+
+
+
+let sheet=
+XLSX.utils.aoa_to_sheet(excelData);
+
+
+
+XLSX.utils.book_append_sheet(
+
+workbook,
+
+sheet,
+
+"员工信息"
+
+);
+
+
+
+XLSX.writeFile(
+
+workbook,
+
+"result.xlsx"
+
+);
+
+
+}
+
+
+
+
+
+
+
+function register(){
+
+
+let user=
+document.getElementById("username").value;
+
+
+document.getElementById("registerResult")
+.innerHTML=
+"注册成功: "+user;
+
+
+runSkill("User Register API Created");
+
+
+}
+
+
+
+
+
+function login(){
+
+
+document.getElementById("loginResult")
+.innerHTML=
+"登录成功 Token: eyJhbGciOiJIUzI1";
+
+
+runSkill("JWT Token Generated");
+
+
+}
+
+
+
+</script>
+
+
+
+</body>
+
+</html>

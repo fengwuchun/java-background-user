@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/city_db_restore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+    username: backend_user
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+data:
+  redis:
+    host: redis
+    port: 6379         
+
+# MCP Server Configuration
+mcp:
+  server:
+    name: mysql-mcp-server
+    version: 1.0.0
+    enabled: true
