@@ -1,13 +1,18 @@
+server:
+    port: 8080 
+
 spring:
   application:
     name: backend
+
+ 
+
   classformat:
     ignore: true
 
-
   datasource:
-    url: jdbc:mysql://localhost:3306/city_db_restore
-    username: root
+    url: jdbc:mysql://127.0.0.1:3306/city_db_restore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    username: backend_user # 本地使用 root 云端使用 backend_user
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -16,16 +21,25 @@ spring:
       ddl-auto: update
     show-sql: true
 
-data:
-  redis:
-    host: localhost
-    port: 6379    
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
-# MCP Server Configuration
+aliyun:
+  sms:
+    access-key-id: ${ALIYUN_ACCESS_KEY_ID}
+    access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET}
+    region: cn-shenzhen
+    sign-name: 速通互联验证码
+    template-code: 100001
+
+environment:
+  - LIYUN_ACCESS_KEY_ID=${ALIYUN_ACCESS_KEY_ID}
+  - LIYUN_ACCESS_KEY_SECRET=${ALIYUN_ACCESS_KEY_SECRET}    
+
 mcp:
   server:
     name: mysql-mcp-server
     version: 1.0.0
     enabled: true
-
-
