@@ -19,8 +19,10 @@ import jakarta.transaction.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.demo.backend.Utils.CurrentUserUtil;
+import com.demo.backend.Utils.JwtUtil;
 
 
 
@@ -163,14 +165,14 @@ public class UserService {
     }
 
     @Transactional
-    public HttpResult<String> deleteUser(Long id,Authentication authentication){
-        if(!this.userRepository.existsById(id)){
-           return HttpResult.error(ResultCode.NOT_FOUND,"用户不存在");
+    public HttpResult<String> deleteUser(Long id, Authentication authentication) {
+        if (!this.userRepository.existsById(id)) {
+            return HttpResult.error(ResultCode.NOT_FOUND, "用户不存在");
         }
         long currentId = CurrentUserUtil.getId();
         String role = CurrentUserUtil.getRole();
-        if(!UserPermissionConfig.hasPermission(currentId, id, role)){
-           return HttpResult.error(ResultCode.FORBIDDEN,"权限不足");
+        if (!UserPermissionConfig.hasPermission(currentId, id, role)) {
+            return HttpResult.error(ResultCode.FORBIDDEN, "权限不足");
         }
         this.userRepository.deleteById(id);
         //删除redis 中的缓存
@@ -178,6 +180,20 @@ public class UserService {
         return HttpResult.success("删除成功");
     }
     
+    public  HttpResult<String> logout(String token){
+       
+    // 获取 Token 剩余有效时间
+    long remainingSeconds = JwtUtil.getRemainingSeconds(token);
 
-   
+    if (remainingSeconds > 0) {
+        // 加入 Redis 黑名单
+        redisUtils.set(
+                "jwt:blacklist:" + token,
+                "1",
+                remainingSeconds,
+                TimeUnit.SECONDS);
+    }
+        return HttpResult.success("退出成功");
+    }
+    
 }

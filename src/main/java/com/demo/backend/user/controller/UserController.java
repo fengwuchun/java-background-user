@@ -4,11 +4,13 @@ import com.demo.backend.user.dto.RegisterRequest;
 import com.demo.backend.user.entity.User;
 import com.demo.backend.user.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -97,5 +99,23 @@ public class UserController {
 
        return this.userService.deleteUser(id,authentication);
     }
+
+    @PostMapping("/auth/logout")
+    public HttpResult<String> logout(HttpServletRequest request) {
+
+    String authHeader = request.getHeader("Authorization");
+
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        return HttpResult.error("Token不存在");
+    }
+
+    String token = authHeader.substring(7);
+
+   return this.userService.logout(token);
+
+  
+
+   
+}
 
 }

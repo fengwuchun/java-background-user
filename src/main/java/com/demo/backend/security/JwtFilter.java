@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.demo.backend.Utils.JwtUtil;
+import com.demo.backend.common.redis.RedisUtils;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,7 +21,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+    private final RedisUtils redisUtils;
 
+    public JwtFilter(RedisUtils redisUtils) {
+        this.redisUtils = redisUtils;
+    }
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -49,6 +55,18 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authorization != null && authorization.startsWith("Bearer ")) {
             String token = authorization.substring(7);
             try {
+                
+                // 检查 Token 是否在黑名单
+                String blacklistKey = "jwt:blacklist:" + token;
+
+                if (redisUtils.exists(blacklistKey)) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().write("{\"message\":\"Token已退出登录\"}");
+                    return;
+                }
+
                 Long id = JwtUtil.parseId(token);
                 String username = JwtUtil.parseUsername(token);
                 String role = JwtUtil.parseRole(token);

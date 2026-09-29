@@ -51,4 +51,21 @@ public class JwtUtil {
                 .getBody();
         return claims.get("id", Long.class);
     }
+
+    public static long getRemainingSeconds(String token) {
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(
+                        Keys.hmacShaKeyFor(
+                                SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        Date expiration = claims.getExpiration();
+
+        long remaining = (expiration.getTime() - System.currentTimeMillis()) / 1000;
+
+        return Math.max(remaining, 0);
+    }
 }
