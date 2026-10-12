@@ -1,5 +1,6 @@
 package com.demo.backend.user.controller;
 import com.demo.backend.common.result.HttpResult;
+import com.demo.backend.user.dto.ForgetPasswordRequest;
 import com.demo.backend.user.dto.RegisterRequest;
 import com.demo.backend.user.entity.User;
 import com.demo.backend.user.service.UserService;
@@ -93,6 +94,11 @@ public class UserController {
     public void forgetPasswordSendCode(@Valid @RequestBody HashMap<String, String> json) {
         this.userService.forgetPasswordSendCode(json);
 
+    }
+
+    @PostMapping("/auth/forgetPwd")
+    public HttpResult<String> forgetPassword(@Valid @RequestBody ForgetPasswordRequest request) {
+        return this.userService.forgetPassword(request);
     }
 
 

@@ -10,6 +10,7 @@ import com.demo.backend.common.redis.RedisUtils;
 import com.demo.backend.common.result.HttpResult;
 import com.demo.backend.security.UserPermissionConfig;
 import com.demo.backend.user.captcha.CaptchaService;
+import com.demo.backend.user.dto.ForgetPasswordRequest;
 import com.demo.backend.user.dto.RegisterRequest;
 import com.demo.backend.user.entity.User;
 import com.demo.backend.user.enums.CaptchaType;
@@ -97,6 +98,26 @@ public class UserService {
     public void forgetPasswordSendCode(HashMap<String, String> json) {
         String phone = json.get("phone");
         this.captchaService.sendCode(CaptchaType.FORGET_PASSWORD, phone);
+    }
+
+    @Transactional
+    public HttpResult<String> forgetPassword(ForgetPasswordRequest request) {
+        User user = this.userRepository.findByEmail(request.getEmail());
+        if (user == null) {
+            return HttpResult.error(ResultCode.NOT_FOUND, "用户不存在");
+        }
+
+        if (!this.captchaService.verify(
+                CaptchaType.FORGET_PASSWORD,
+                user.getPhone(),
+                request.getCode())) {
+            return HttpResult.error(ResultCode.PARAM_ERROR, "验证码错误或已过期");
+        }
+
+        user.setPassword(request.getPassword());
+        this.userRepository.save(user);
+        this.redisUtils.delete(RedisKey.USER(user.getId()));
+        return HttpResult.success("密码重置成功");
     }
 
     public List<User> getAllUsers(){
