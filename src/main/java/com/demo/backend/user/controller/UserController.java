@@ -37,22 +37,44 @@ public class UserController {
         System.out.println("----------进入了login----------");
         String username = loginRequest.get("email");
         String password = loginRequest.get("password");
-        System.out.println("登录时用户邮箱：:"+username);
-         System.out.println("登录时用户密码：:"+password);
+        System.out.println("登录时用户邮箱：:" + username);
+        System.out.println("登录时用户密码：:" + password);
 
         if (username == null || password == null) {
             throw new IllegalArgumentException("username 和 password 不能为空");
         }
 
-      User user =  this.userService.getUserByEamilAndPassword(username, password);
-      if(user == null){
-        return HttpResult.error("用户名或密码错误");
-      }
-      String role = user.getRole();
-      String token = JwtUtil.createToken(username,role,user.getId());
-      System.out.println("登录成功，token："+token);
-      return HttpResult.success(token);
+        User user = this.userService.getUserByEamilAndPassword(username, password);
+        if (user == null) {
+            return HttpResult.error("用户名或密码错误");
+        }
+        String role = user.getRole();
+        String token = JwtUtil.createToken(username, role, user.getId());
+        System.out.println("登录成功，token：" + token);
+        return HttpResult.success(token);
     }
+    
+    @PostMapping("/auth/auto-login")
+    public HttpResult<String> autologin(@RequestBody Map<String, String> loginRequest) {
+        System.out.println("----------进入了login----------");
+        String username = loginRequest.get("email");
+       
+        System.out.println("登录时用户邮箱：:" + username);
+
+        if (username == null) {
+            return null;
+        }
+
+        User user = this.userService.getUserByEmail(username);
+        if (user == null) {
+            return null;
+        }
+        String role = user.getRole();
+        String token = JwtUtil.createToken(username, role, user.getId());
+        System.out.println("自动登录成功，token：" + token);
+        return HttpResult.success(token);
+    }
+
 
     @PostMapping("/auth/register")
     public ResponseEntity<?> addUser(@Valid @RequestBody RegisterRequest registerRequest){
@@ -62,8 +84,14 @@ public class UserController {
     }
 
     @PostMapping("/auth/register/sendCode")
-    public void registerSendCode(@Valid @RequestBody HashMap<String,String> json){
-     this.userService.registerSendCode(json);
+    public void registerSendCode(@Valid @RequestBody HashMap<String, String> json) {
+        this.userService.registerSendCode(json);
+
+    }
+    
+    @PostMapping("/auth/forgetPwd/sendCode")
+    public void forgetPasswordSendCode(@Valid @RequestBody HashMap<String, String> json) {
+        this.userService.forgetPasswordSendCode(json);
 
     }
 

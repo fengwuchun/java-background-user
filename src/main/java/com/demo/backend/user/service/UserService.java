@@ -89,9 +89,14 @@ public class UserService {
         
     }
 
-    public void registerSendCode(HashMap<String,String> json){
+    public void registerSendCode(HashMap<String, String> json) {
         String phone = json.get("phone");
-      this.captchaService.sendCode(CaptchaType.REGISTER,phone);
+        this.captchaService.sendCode(CaptchaType.REGISTER, phone);
+    }
+    
+    public void forgetPasswordSendCode(HashMap<String, String> json) {
+        String phone = json.get("phone");
+        this.captchaService.sendCode(CaptchaType.FORGET_PASSWORD, phone);
     }
 
     public List<User> getAllUsers(){
